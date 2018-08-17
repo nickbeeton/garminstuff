@@ -1,7 +1,7 @@
 /*
 Here's javascript that can be run in any modern browser fairly simply in javascript. Might be easier to set up than Python.
 
-You'll want to pre-set a download location in your browser settings to some folder, name it TCX or something, and tell your browser to auto-download there, or else you'll get a ton of popup save dialogs.
+You'll want to pre-set a download location in your browser settings to some folder, and tell your browser to auto-download there, or else you'll get a ton of popup save dialogs.
 
 First Navigate to the last (most recent) activity you have in Garmin Connect (as in https://connect.garmin.com/modern/activity/5555555555 ), then hit F12 (should work in chrome/IE) to open dev tools to get to the Javascript Console. Then paste the below code and hit enter to run it. Can change ttl from 100 to whatever # of activities you want to download.
 If you want a different format, change the "tcx" part of the URL to the appropriate format acronym if garmin supports it.
