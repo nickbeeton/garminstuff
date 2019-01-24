@@ -1,6 +1,8 @@
 # Mona Fartlek analysis
 library(rgdal)
 X = readLines("C:/Users/beetonn/Downloads/Mona_Fartlek_20_min (5).gpx")
+start = 0
+
 # extraction
 coords = unlist(lapply(strsplit(X[grep('<trkpt', X)], '"'), function(x) x[c(2,4)]))
 coords = t(matrix(as.numeric(coords), 2, length(coords)/2))
@@ -20,11 +22,11 @@ slope = diff(ele)/dist
 par(cex=1.5, lwd=2)
 plot(time[-1]/60, vel, type='o', 
      ylim = 60/rev(c(2.75, 6.25)), pch=19, cex=0.5, xlab = 'Time (mins)', 
-     ylab = 'Pace (min/km)', axes = FALSE)#, xlim = c(11,31))
+     ylab = 'Pace (min/km)', axes = FALSE, xlim = start/60 + c(0,20))
 axis(1)
 axis(2, at = 60/seq(3,6,0.5), labels = c('3:00', '3:30', '4:00', '4:30', '5:00', '5:30', '6:00'), las = 1)
 box(bty = 'O')
-start = 0
+
 laps = start + c(90*(0:4), 360+60*(1:8), 840+30*(1:8), 1080+15*(1:8))
 abline(v = c(0,laps)/60, col='grey', lty=2)
 abline(h = 60/seq(3,4,0.25), col='grey', lty=2)

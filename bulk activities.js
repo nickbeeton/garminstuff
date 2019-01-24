@@ -17,7 +17,7 @@ If your connection is too slow to do a full download in less than 3 seconds ever
 var a = window.location.pathname.split("/");
 var id = a[a.length-1];
 var tcxUrl = "https://connect.garmin.com/modern/proxy/download-service/files/activity/";
-var cnt = 1, ttl = 100; /*Change ttl from 100 to whatever # of activities you want to download*/
+var cnt = 1, ttl = 10; /*Change ttl from 100 to whatever # of activities you want to download*/
 var downloadTimeoutLength = 3 * 1000;
 var downloadUrl = tcxUrl + id;
 window.location.href = downloadUrl;
