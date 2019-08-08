@@ -8,14 +8,7 @@
 // @grant        none
 // ==/UserScript==
 
-if (window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0){
-    var btn = window.document.createElement("BUTTON"); // Create a <button> element
-    btn.innerHTML = "Copy Bike Segments to Ebike Segments"; // Insert text
-    btn.onclick = window.f;
-    window.document.getElementsByClassName("activity-description-container")[0].appendChild(btn);
-}
-
-window.f = function(){
+window.f = function(boole){
 	window.scriptsorig = window.document.getElementsByTagName("script");
 	for (var i = 0; i < window.scriptsorig.length; i++){
 		if (window.scriptsorig[i].innerHTML.search("end_index") >= 0){
@@ -82,40 +75,97 @@ window.f = function(){
 					window2.close();
 				};
 				console.log("Segment loading done");
-				window.newseg(0);
+				window.newseg(0, boole);
 			}), 5000);
 		}), 5000);
 	}), 5000);
 };
 
-window.newseg = function(i){
-	var distbuffer = 10;
-
-	if (i < window.names.length){
+window.newseg = function(i, boole){
+	window.distbuffer = 10;
+	
+	if (window.document.getElementsByClassName("alert-message").length == 0){
+		window.tms = true;
+		console.log("CREATED TOO MANY SEGMENTS: exiting");
+	}
+	
+	if (i < window.names.length & window.tms == false){
 		window.clash = false;
 		for (var j = 0; j < window.scriptsorig.length; j++){
-			if (Math.abs(parseInt(window.start_indices[i]) - parseInt(window.start_indicesorig[j])) < distbuffer & Math.abs(parseInt(window.end_indices[i]) - parseInt(window.end_indicesorig[j])) < distbuffer){
-				var clash = true;
+			if (Math.abs(parseInt(window.start_indices[i]) - parseInt(window.start_indicesorig[j])) < window.distbuffer & Math.abs(parseInt(window.end_indices[i]) - parseInt(window.end_indicesorig[j])) < window.distbuffer){
+				window.clash = true;
             }
 		}
 
-		if (clash){
-			console.log("CLASH WITH EXISTING SEGMENT: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
+		if (window.clash){
+			console.log("CLASH WITH EXISTING SEGMENT: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
+			window.newseg(i+1, boole);
         } else {
 			setTimeout((window.k = function(){
 				var actno = window.document.URL.replace(/[^0-9]/g, "");
 				var window2 = open("https://www.strava.com/publishes/wizard?id="+actno+"&origin=activity");
 				window2.focus();
 				window2.onload = function() {
-					window2.document.getElementById("segment_name").value = window.names[i];
-					window2.document.getElementById("segment-start-index").value = window.start_indices[i];
-					window2.document.getElementById("segment-end-index").value = window.end_indices[i];
-					window2.document.getElementsByClassName("callout")[0].click();
-					window2.close();
+					if (window2.document.getElementsByClassName("alert-message").length > 0){
+						window.tms = true;
+						window2.close();
+					} else {
+						window2.document.getElementById("segment_name").value = window.names[i];
+						window2.document.getElementById("segment-start-index").value = window.start_indices[i];
+						window2.document.getElementById("segment-end-index").value = window.end_indices[i];
+						window2.document.getElementById("private").value = boole;
+						window2.document.getElementsByClassName("callout")[0].click();
+						window2.close();
+					}
 				};
-				console.log("Created segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
-				window.newseg(i+1);
+				if (window.tms){
+					console.log("CREATED TOO MANY SEGMENTS: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
+				} else {
+					console.log("Created segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
+					window.newseg(i+1, boole);					
+				}
 			}), 5000);
 		}
 	}
+	
+	if (window.document.getElementsByClassName("alert-message").length == 0){
+		window.tms = true;
+		console.log("CREATED TOO MANY SEGMENTS: exiting");
+	}
+}
+
+window.f1 = function(){
+    window.f(false);
+}
+
+window.f2 = function(){
+    window.f(true);
+}
+
+window.f3 = function(){
+	window.alert("You have created too many segments - try again later.")
+}
+
+if (window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0){
+	window.tms = (window.document.getElementsByClassName("alert-message").length > 0)
+
+	var btn1 = window.document.createElement("BUTTON"); // Create a <button> element
+    btn1.innerHTML = "Copy Bike Segments to PUBLIC Ebike Segments"; // Insert text
+    btn1.onclick = window.f1;
+    btn1.className = 'btn-primary btn-xs';
+    window.document.getElementsByClassName("activity-description-container")[0].appendChild(btn1);
+
+    var btn2 = window.document.createElement("BUTTON"); // Create a <button> element
+    btn2.innerHTML = "Copy Bike Segments to PRIVATE Ebike Segments"; // Insert text
+    btn2.onclick = window.f2;
+    btn2.className = 'btn-primary btn-xs';
+    window.document.getElementsByClassName("activity-description-container")[0].appendChild(btn2);
+
+	if (window.tms){
+		btn1.onclick = window.f3;
+		btn2.onclick = window.f3;
+		btn1.classname = "minimal button"
+		btn2.classname = "minimal button"
+	}
+
 }
