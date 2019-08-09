@@ -19,15 +19,11 @@ window.f = function(boole){
 	window.namesorig = Array(window.stufforig.length - 1);
 	window.start_indicesorig = Array(window.stufforig.length - 1);
 	window.end_indicesorig = Array(window.stufforig.length - 1);
-	//privatesorig = Array(stufforig.length - 1);
-	//hiddensorig = Array(stufforig.length - 1);
 	for (i = 1; i < window.stufforig.length; i++) // skip the first
 	{
 		window.namesorig[i-1] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
 		window.start_indicesorig[i-1] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
 		window.end_indicesorig[i-1] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
-		//privatesorig[i-1] = stufforig[i].match(/private_segment\":[^,]+/g)[0].replace("private_segment\":","")
-		//hiddensorig[i-1] = stufforig[i].match(/hidden_by_athlete\":[^}]+/g)[0].replace("hidden_by_athlete\":","")
 	}
 
 	var window2 = open(window.document.URL+"/edit");
@@ -53,16 +49,12 @@ window.f = function(boole){
 			window.names = Array(window.stuff.length - 1);
 			window.start_indices = Array(window.stuff.length - 1);
 			window.end_indices = Array(window.stuff.length - 1);
-			//privates = Array(stuff.length - 1);
-			//hiddens = Array(stuff.length - 1);
 			for (i = 1; i < window.stuff.length; i++) // skip the first
 			{
 				window.names[i-1] = window.stuff[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
 				window.start_indices[i-1] = window.stuff[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
 				window.end_indices[i-1] = window.stuff[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
 				console.log("Loaded segment "+window.names[i-1]);
-				//privates[i-1] = stuff[i].match(/private_segment\":[^,]+/g)[0].replace("private_segment\":","")
-				//hiddens[i-1] = stuff[i].match(/hidden_by_athlete\":[^}]+/g)[0].replace("hidden_by_athlete\":","")
 			}
 
 			setTimeout((window.j = function(){
@@ -83,12 +75,10 @@ window.f = function(boole){
 
 window.newseg = function(i, boole){
 	window.distbuffer = 10;
-	
-	if (window.document.getElementsByClassName("alert-message").length == 0){
+	if (window.document.getElementsByClassName("alert-message").length > 0){
 		window.tms = true;
 		console.log("CREATED TOO MANY SEGMENTS: exiting");
 	}
-	
 	if (i < window.names.length & window.tms == false){
 		window.clash = false;
 		for (var j = 0; j < window.scriptsorig.length; j++){
@@ -113,22 +103,21 @@ window.newseg = function(i, boole){
 						window2.document.getElementById("segment_name").value = window.names[i];
 						window2.document.getElementById("segment-start-index").value = window.start_indices[i];
 						window2.document.getElementById("segment-end-index").value = window.end_indices[i];
-						window2.document.getElementById("private").value = boole;
+						window2.document.getElementById("private").checked = boole;
 						window2.document.getElementsByClassName("callout")[0].click();
 						window2.close();
 					}
 				};
 				if (window.tms){
-					console.log("CREATED TOO MANY SEGMENTS: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
+					console.log("CREATED TOO MANY SEGMENTS: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
 				} else {
-					console.log("Created segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i])
-					window.newseg(i+1, boole);					
+					console.log("Created segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
+					window.newseg(i+1, boole);
 				}
 			}), 5000);
 		}
 	}
-	
-	if (window.document.getElementsByClassName("alert-message").length == 0){
+	if (window.document.getElementsByClassName("alert-message").length > 0){
 		window.tms = true;
 		console.log("CREATED TOO MANY SEGMENTS: exiting");
 	}
