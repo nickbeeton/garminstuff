@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.1
+// @version      0.2
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -9,22 +9,37 @@
 // ==/UserScript==
 
 window.f = function(boole){
-	window.scriptsorig = window.document.getElementsByTagName("script");
-	for (var i = 0; i < window.scriptsorig.length; i++){
-		if (window.scriptsorig[i].innerHTML.search("end_index") >= 0){
-				break;
+    window.scriptsorig = window.document.getElementsByTagName("script");
+    var found;
+
+    for (var i = 0; i < window.scriptsorig.length; i++){
+        console.log(i);
+        console.log(window.scriptsorig[i].innerHTML);
+
+        if (window.scriptsorig[i].innerHTML.search("end_index") >= 0){
+            found = true;
+            break;
         }
-	}
-	window.stufforig = window.scriptsorig[i].innerHTML.split("\"achievement_description\":");
-	window.namesorig = Array(window.stufforig.length - 1);
-	window.start_indicesorig = Array(window.stufforig.length - 1);
-	window.end_indicesorig = Array(window.stufforig.length - 1);
-	for (i = 1; i < window.stufforig.length; i++) // skip the first
-	{
-		window.namesorig[i-1] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
-		window.start_indicesorig[i-1] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
-		window.end_indicesorig[i-1] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
-	}
+    }
+
+    if(found) {
+        window.stufforig = window.scriptsorig[i].innerHTML.split("\"achievement_description\":");
+        window.namesorig = Array(window.stufforig.length - 1);
+        window.start_indicesorig = Array(window.stufforig.length - 1);
+        window.end_indicesorig = Array(window.stufforig.length - 1);
+        for (i = 1; i < window.stufforig.length; i++) // skip the first
+        {
+            window.namesorig[i-1] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
+            window.start_indicesorig[i-1] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
+            window.end_indicesorig[i-1] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
+        }
+    }
+    else {
+        window.stufforig = Array(1);
+        window.namesorig = Array(window.stufforig.length - 1);
+        window.start_indicesorig = Array(window.stufforig.length - 1);
+        window.end_indicesorig = Array(window.stufforig.length - 1);
+    }
 
 	var window2 = open(window.document.URL+"/edit");
 	window2.focus();
