@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.2
+// @version      0.3
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -13,9 +13,6 @@ window.f = function(boole){
     var found;
 
     for (var i = 0; i < window.scriptsorig.length; i++){
-        console.log(i);
-        console.log(window.scriptsorig[i].innerHTML);
-
         if (window.scriptsorig[i].innerHTML.search("end_index") >= 0){
             found = true;
             break;
@@ -32,6 +29,7 @@ window.f = function(boole){
             window.namesorig[i-1] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
             window.start_indicesorig[i-1] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
             window.end_indicesorig[i-1] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
+            console.log("Original segment "+window.namesorig[i-1]+" start "+window.start_indicesorig[i-1]+" end "+window.end_indicesorig[i-1]);
         }
     }
     else {
@@ -80,6 +78,7 @@ window.f = function(boole){
 					window2.document.getElementsByClassName('btn-save-activity')[0].click();
 					window3.close();
 					window2.close();
+                    window.focus(); // doesn't work, try again later
 				};
 				console.log("Segment loading done");
 				window.newseg(0, boole);
@@ -96,7 +95,7 @@ window.newseg = function(i, boole){
 	}
 	if (i < window.names.length & window.tms == false){
 		window.clash = false;
-		for (var j = 0; j < window.scriptsorig.length; j++){
+		for (var j = 0; j < window.stufforig.length; j++){
 			if (Math.abs(parseInt(window.start_indices[i]) - parseInt(window.start_indicesorig[j])) < window.distbuffer & Math.abs(parseInt(window.end_indices[i]) - parseInt(window.end_indicesorig[j])) < window.distbuffer){
 				window.clash = true;
             }
@@ -150,7 +149,7 @@ window.f3 = function(){
 	window.alert("You have created too many segments - try again later.")
 }
 
-if (window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0){
+if (window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0 & window.document.getElementsByClassName("icon-edit").length > 0){ // your own ebike ride
 	window.tms = (window.document.getElementsByClassName("alert-message").length > 0)
 
 	var btn1 = window.document.createElement("BUTTON"); // Create a <button> element
