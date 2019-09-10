@@ -44,12 +44,12 @@ window.f = function(boole){
 	window2.onload = function() { // once it's loaded, change it to bike and save
 		window2.document.getElementById('activity_type').value = "Ride";
 		window2.document.getElementsByClassName('btn-save-activity')[0].click();
-		window2.close();
 	};
 
 	setTimeout((window.g = function(){
 		var window3 = open(window.document.URL);
 		setTimeout((window.h = function(){
+			window2.close();
 			window.scripts = window3.document.getElementsByTagName("script");
 
 			for (i = 0; i < window.scripts.length; i++){
@@ -77,7 +77,9 @@ window.f = function(boole){
 					window2.document.getElementById('activity_type').value = "EBikeRide";
 					window2.document.getElementsByClassName('btn-save-activity')[0].click();
 					window3.close();
-					window2.close();
+					setTimeout(function(){
+						window2.close();
+					}, 3000);
                     window.focus(); // doesn't work, try again later
 				};
 				console.log("Segment loading done");
@@ -101,6 +103,16 @@ window.newseg = function(i, boole){
             }
 		}
 
+		if (!window.clash) {
+		  for (j = 0; j<window.namesorig.length; j++) {
+			if (window.names[i] == window.namesorig[j]) {
+			  window.clash = true;
+			  console.log('Existing E-Bike segment with identical name (' + window.names[i] + ') already exists.');
+			  break;
+			}
+		  }
+		}
+
 		if (window.clash){
 			console.log("CLASH WITH EXISTING SEGMENT: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
 			window.newseg(i+1, boole);
@@ -112,14 +124,18 @@ window.newseg = function(i, boole){
 				window2.onload = function() {
 					if (window2.document.getElementsByClassName("alert-message").length > 0){
 						window.tms = true;
-						window2.close();
+						setTimeout(function(){
+							window2.close();
+						}, 3000);
 					} else {
 						window2.document.getElementById("segment_name").value = window.names[i];
 						window2.document.getElementById("segment-start-index").value = window.start_indices[i];
 						window2.document.getElementById("segment-end-index").value = window.end_indices[i];
 						window2.document.getElementById("private").checked = boole;
 						window2.document.getElementsByClassName("callout")[0].click();
-						window2.close();
+						setTimeout(function(){
+							window2.close();
+						}, 3000);
 					}
 				};
 				if (window.tms){
