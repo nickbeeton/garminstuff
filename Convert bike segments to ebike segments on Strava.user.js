@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.3
+// @version      0.4
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -57,7 +57,7 @@ window.f = function(boole){
 						break;
                 }
 			}
-
+            console.log("Index: "+i);
 			window.stuff = window.scripts[i].innerHTML.split("\"achievement_description\":");
 			window.names = Array(window.stuff.length - 1);
 			window.start_indices = Array(window.stuff.length - 1);
@@ -77,7 +77,7 @@ window.f = function(boole){
 					window2.document.getElementById('activity_type').value = "EBikeRide";
 					window2.document.getElementsByClassName('btn-save-activity')[0].click();
 					window3.close();
-					setTimeout(function(){
+					setTimeout(window.w = function(){
 						window2.close();
 					}, 3000);
                     window.focus(); // doesn't work, try again later
@@ -124,19 +124,27 @@ window.newseg = function(i, boole){
 				window2.onload = function() {
 					if (window2.document.getElementsByClassName("alert-message").length > 0){
 						window.tms = true;
-						setTimeout(function(){
+						setTimeout(window.x = function(){
 							window2.close();
 						}, 3000);
 					} else {
-						window2.document.getElementById("segment_name").value = window.names[i];
-						window2.document.getElementById("segment-start-index").value = window.start_indices[i];
-						window2.document.getElementById("segment-end-index").value = window.end_indices[i];
-						window2.document.getElementById("private").checked = boole;
-						window2.document.getElementsByClassName("callout")[0].click();
-						setTimeout(function(){
-							window2.close();
-						}, 3000);
-					}
+						setTimeout(window.v = function(){
+                            setTimeout(window.u = function(){
+                                window2.document.getElementsByClassName("Handle--slider--qH0x_")[0].setAttribute("aria-valuenow", window.start_indices[i]);
+                                window2.document.getElementsByClassName("Handle--slider--qH0x_")[1].setAttribute("aria-valuenow", window.end_indices[i]);
+                                window2.document.getElementsByClassName("StepActions--next--3gzyo")[0].click()
+                                setTimeout(window.y = function(){
+                                    setTimeout(window.z = function(){
+                                        window2.document.getElementById("segment_name").value = window.names[i];
+                                        window2.document.getElementsByName("private")[0].checked = boole;
+                                        window2.document.getElementsByClassName("StepActions--next--3gzyo")[0].disabled = false;
+                                    }, 3000);
+                                    window2.document.getElementsByClassName("StepActions--next--3gzyo")[0].click();
+                                }, 3000);
+                                window2.close();
+                            }, 3000);
+                        }, 3000);
+					};
 				};
 				if (window.tms){
 					console.log("CREATED TOO MANY SEGMENTS: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
@@ -188,3 +196,4 @@ if (window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike 
 	}
 
 }
+
