@@ -170,8 +170,10 @@ window.newseg = function(i, boole, callback){
 		console.log("CREATED TOO MANY SEGMENTS: exiting");
 	}
 	
-	// if we haven't run out of segments and we haven't got an alert message, keep going
-	if (i < window.names.length & window.tms == false){
+	if (typeof window.names === 'undefined'){ // if there are no bike segments, report and stop
+		console.log("There are no bike segments to convert!")
+	}
+	else if (i < window.names.length & window.tms == false){ // if we haven't run out of segments and we haven't got an alert message, keep going
 		window.clash = false;
 		// check whether the start and end indices for the i-th bike ride segment 
 		// are within window.distbuffer of any existing e-bike ride segments
