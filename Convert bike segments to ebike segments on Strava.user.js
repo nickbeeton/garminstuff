@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.5
+// @version      0.5.1
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -60,18 +60,18 @@ window.z = function(boole, callback, ebike) {
 		console.log("timeout activated");
 		// once all of the above is done, open the original link but now as a bike ride (now window not window2)
 		if (typeof window.window2.document.getElementsByClassName("title")[0] === 'undefined'){
-            boo = true
+            window.boo = true
         }
         else {
             if (!ebike){
-                boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("\nRide") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("\nRide") <= 0))
             }
             else{
-                boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") <= 0))
             }
         }
         
-        if (boo){
+        if (window.boo){
 			window.z(boole, callback);
 		}
 		else{ // wait another second
@@ -302,10 +302,6 @@ window.k2 = function(i, boole) {
 		};
 	}, 1000);
 };
-
-
-
-window.f(false);
 
 window.f1 = function(){
     window.f(false, window.g);
