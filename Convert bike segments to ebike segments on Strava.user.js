@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.6.0
+// @version      0.6.1
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -47,6 +47,9 @@ window.f = async function(boole){
         window.end_indicesorig = Array(window.stufforig.length - 1);
     }
 
+    // save segments bit of webpage to compare later
+    window.ebikesegs = window.document.getElementsByClassName("dense hoverable marginless segments")[0];
+
     // open a new window (window2) to edit the e-bike ride from the original window
     // we need a new window so we can continue running script from original
     window.b1 = false;
@@ -56,6 +59,8 @@ window.f = async function(boole){
 };
 
 window.z = function(boole, callback, ebike) {
+    console.log("window.z started");
+    window.focus();
     setTimeout(function(){
         console.log("timeout activated");
         // once all of the above is done, open the original link but now as a bike ride (now window not window2)
@@ -92,6 +97,7 @@ window.ff = async function(boole){
     window.window2.focus();
     window.window2.document.getElementById('activity_type').value = "Ride";
     window.window2.document.getElementsByClassName('btn-save-activity')[0].click();
+    window.focus();
 
     // until we're back at the ride webpage
     window.boo2 = false;
@@ -102,43 +108,59 @@ window.ff = async function(boole){
 // and save in global variables
 window.h = function(boole, callback){
     console.log("window.h started");
-    // close edit window, no longer needed
-    //window.window2.close();
+    window.b1 = true;
+    window.window2.location.reload();
+    window.window2.onload = function() {if (!window.b1) {window.h(boole, callback); window.b1 = true;}};
+    window.window2.location.reload();
+            
+    setTimeout(function(){
+        console.log("timeout activated");
 
-    // repeat process started in window.f for the e-bike segments
-    // but for the bike segments (window2 not window3)
-    window.scripts = window.window2.document.getElementsByTagName("script");
+        // save segments bit of webpage to compare later
+        window.bikesegs = window.window2.document.getElementsByClassName("dense hoverable marginless segments")[0];
+        
+        // if bike segments have loaded properly, keep going, else wait another second
+        if (typeof window.bikesegs !== 'undefined' & window.bikesegs !== window.ebikesegs) {
+            // repeat process started in window.f for the e-bike segments
+            // but for the bike segments (window2 not window3)
+            window.scripts = window.window2.document.getElementsByTagName("script");
 
-    for (var i = 0; i < window.scripts.length; i++){
-        if (window.scripts[i].innerHTML.search("end_index") >= 0){
-                break;
+            for (var i = 0; i < window.scripts.length; i++){
+                if (window.scripts[i].innerHTML.search("end_index") >= 0){
+                        break;
+                }
+            }
+
+            if (i == window.scripts.length){ // if we don't actually find any segments
+                console.log("No bike segments found");
+            }
+            else { // otherwise, store them
+                console.log("Index: "+i);
+                window.stuff = window.scripts[i].innerHTML.split("\"achievement_description\":");
+                window.names = Array(window.stuff.length - 1);
+                window.start_indices = Array(window.stuff.length - 1);
+                window.end_indices = Array(window.stuff.length - 1);
+                for (i = 1; i < window.stuff.length; i++) // skip the first
+                {
+                    window.names[i-1] = window.stuff[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
+                    window.start_indices[i-1] = window.stuff[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
+                    window.end_indices[i-1] = window.stuff[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
+                    console.log("Loaded segment "+window.names[i-1]);
+                }
+            }
+            // now we have our data, change the ride back to e-bike ride
+            // open a new window (window3) to edit the e-bike ride from the original window
+            window.b1 = false;
+            window.window3 = open(window.document.URL+"/edit");
+            window.window3.onload = function() {if (!window.b1) {callback(boole); window.b1 = true;}};
+            window.window3.location.reload();
         }
-    }
-
-    if (i == window.scripts.length){ // if we don't actually find any segments
-        console.log("No bike segments found");
-    }
-    else // otherwise, store them
-    {
-        console.log("Index: "+i);
-        window.stuff = window.scripts[i].innerHTML.split("\"achievement_description\":");
-        window.names = Array(window.stuff.length - 1);
-        window.start_indices = Array(window.stuff.length - 1);
-        window.end_indices = Array(window.stuff.length - 1);
-        for (i = 1; i < window.stuff.length; i++) // skip the first
-        {
-            window.names[i-1] = window.stuff[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
-            window.start_indices[i-1] = window.stuff[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
-            window.end_indices[i-1] = window.stuff[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
-            console.log("Loaded segment "+window.names[i-1]);
+        else {
+            console.log("Bike segments not loaded yet -- trying again");
+            window.b1 = false;
+            window.window2.location.reload();
         }
-    }
-    // now we have our data, change the ride back to e-bike ride
-    // open a new window (window3) to edit the e-bike ride from the original window
-    window.b1 = false;
-    window.window3 = open(window.document.URL+"/edit");
-    window.window3.onload = function() {if (!window.b1) {callback(boole); window.b1 = true;}};
-    window.window3.location.reload();
+    }, 2000);
 };
 
 window.w = function(boole){
@@ -156,6 +178,7 @@ window.j = function(boole){
     window.window3.focus();
     window.window3.document.getElementById('activity_type').value = "EBikeRide";
     window.window3.document.getElementsByClassName('btn-save-activity')[0].click();
+    window.focus();
     window.boo2 = false;
     window.z(boole, window.w, true);
 };
@@ -238,22 +261,29 @@ window.k = function(i, boole, callback){
         }
         else {
             // slightly less extremely messy way of doing it
+            console.log("Creating segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
 
             // move start point far left and end point far right by "dragging mouse"
             window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], -10000)
             window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], 10000)
             console.log("Dragged points to edges");
+            console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
+            console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
 
             // test out the effect of "dragging" the start point 100 pixels right
             window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], 100)
             var effect = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow")/100.;
             var maxval = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow");
             console.log("Mouse test complete");
+            console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
+            console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
 
             // actually move the start and end points to roughly where they should go
             window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], Math.round(window.start_indices[i]/effect) - 100)
             window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], Math.round((window.end_indices[i] - maxval)/effect))
             console.log("Initial drag and drops complete");
+            console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
+            console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
 
             // make minor adjustments if necessary using buttons
             // adjust end point
@@ -287,6 +317,9 @@ window.k = function(i, boole, callback){
             };
 
             setTimeout(function(){ // give it a second to deal with all those mouse and button presses...
+                console.log("button pressing done");
+                console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
+                console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
                 window.window2.document.querySelectorAll("*[class*=\"StepActions--next--\"]")[0].click();
                 callback(i, boole); // call window.k2
             }, 1000);
@@ -303,11 +336,14 @@ window.k2 = function(i, boole) {
 
         if (window.window2.document.getElementById("segment_name") == null){ // if it's not there yet
             if (window.window2.document.querySelectorAll("*[class*=\"Step2--list--\"]")[0] == null){
+                console.log("Nothing loaded yet");
                 window.k2(i, boole); // try again in 1 second
             }
             else if (typeof window.window2.document.querySelectorAll("*[class*=\"Step2--list--\"]")[0] !== 'undefined'){ // if we're getting the "Verify Similar Segments" question, verify and click next
+                console.log("Verify similar segments message");
                 window.window2.document.querySelectorAll("*[class*=\"Step2--list--\"]")[0].firstElementChild.firstElementChild.firstElementChild.click();
                 window.window2.document.querySelectorAll("*[class*=\"StepActions--next--\"]")[0].click();
+                window.k2(i, boole); // try again in 1 second
             }
             else { // if the segment is too short
                 console.log("Segment too short: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
