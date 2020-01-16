@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.6.2
+// @version      0.6.3
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -354,8 +354,14 @@ window.k2 = function(i, boole) {
 
         if (window.window2.document.getElementById("segment_name") == null){ // if it's not there yet
             if (window.window2.document.querySelectorAll("*[class*=\"Step2--list--\"]")[0] == null){
-                console.log("Nothing loaded yet");
-                window.k2(i, boole); // try again in 1 second
+                if (window.window2.document.querySelectorAll("*[class*=\"Step1--error--\"]")[0] != null){ // segment too short
+                    console.log("Segment too short: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
+                    window.newseg(i+1, boole, window.k);   
+                }
+                else{
+                    console.log("Nothing loaded yet");
+                    window.k2(i, boole); // try again in 1 second
+                }
             }
             else if (typeof window.window2.document.querySelectorAll("*[class*=\"Step2--list--\"]")[0] !== 'undefined'){ // if we're getting the "Verify Similar Segments" question, verify and click next
                 console.log("Verify similar segments message");
@@ -363,8 +369,8 @@ window.k2 = function(i, boole) {
                 window.window2.document.querySelectorAll("*[class*=\"StepActions--next--\"]")[0].click();
                 window.k2(i, boole); // try again in 1 second
             }
-            else { // if the segment is too short
-                console.log("Segment too short: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
+            else { // something else??
+                console.log("Unknown error: did not create segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
                 window.newseg(i+1, boole, window.k);
             }
         }
