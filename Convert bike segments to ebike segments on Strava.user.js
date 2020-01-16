@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.6.1
+// @version      0.6.2
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -166,6 +166,7 @@ window.h = function(boole, callback){
 window.w = function(boole){
     window.window3.close();
     window.window2.close();
+    window.focus();
     console.log("Segment loading done");
     // now we start making new segments, starting from the first
     window.newseg(0, boole, window.k);
@@ -226,7 +227,7 @@ window.newseg = function(i, boole, callback){
             window.b1 = false;
             var actno = window.document.URL.replace(/[^0-9]/g, "");
             window.window2 = open("https://www.strava.com/publishes/wizard?id="+actno+"&origin=activity");
-            window.window2.onload = function() {if (!window.b1) {callback(i, boole, window.k2); window.b1 = true;}};
+            window.window2.onload = function() {if (!window.b1) {callback(i, boole, window.k1); window.b1 = true;}};
             window.window2.location.reload();
         }
     }
@@ -260,31 +261,46 @@ window.k = function(i, boole, callback){
             window.k(i, boole, callback);
         }
         else {
+            callback(i, boole, window.k2, 0); // call window.k1
+        };
+    }, 1000);
+};
+
+window.k1 = function(i, boole, callback, part){
+    window.window.focus();
+    setTimeout(function(){ // wait 1/2 second between parts of function
+        window.window2.focus();
+        if (part == 0){
             // slightly less extremely messy way of doing it
             console.log("Creating segment "+window.names[i]+" start "+window.start_indices[i]+" end "+window.end_indices[i]);
-
             // move start point far left and end point far right by "dragging mouse"
-            window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], -10000)
-            window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], 10000)
+            window.triggerDragAndDrop(window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], -10000, window.window2, window.window2.document);
+            window.triggerDragAndDrop(window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], 10000, window.window2, window.window2.document);
             console.log("Dragged points to edges");
             console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
             console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
-
+            window.k1(i, boole, callback, 1);
+        }
+        else if (part == 1){
             // test out the effect of "dragging" the start point 100 pixels right
-            window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], 100)
-            var effect = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow")/100.;
-            var maxval = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow");
+            window.triggerDragAndDrop(window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], 100, window.window2, window.window2.document);
+            window.effect = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow")/100.;
+            window.maxval = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow");
             console.log("Mouse test complete");
             console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
             console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
-
+            window.k1(i, boole, callback, 2);
+        }
+        else if (part == 2){
             // actually move the start and end points to roughly where they should go
-            window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], Math.round(window.start_indices[i]/effect) - 100)
-            window.triggerDragAndDrop(window.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], Math.round((window.end_indices[i] - maxval)/effect))
+            window.triggerDragAndDrop(window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0], Math.round(window.start_indices[i]/effect) - 100, window.window2, window.window2.document);
+            window.triggerDragAndDrop(window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1], Math.round((window.end_indices[i] - maxval)/effect), window.window2, window.window2.document);
             console.log("Initial drag and drops complete");
             console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
             console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
-
+            window.k1(i, boole, callback, 3);
+        }
+        else if (part == 3){
             // make minor adjustments if necessary using buttons
             // adjust end point
             var endpoint = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow");
@@ -300,7 +316,9 @@ window.k = function(i, boole, callback){
                     console.log("End point button press");
                 }
             };
-
+            window.k1(i, boole, callback, 4);
+        }
+        else if (part == 4){
             // adjust start point
             var startpoint = window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow");
             if (startpoint > window.start_indices[i]){
@@ -315,17 +333,17 @@ window.k = function(i, boole, callback){
                     console.log("Start point button press");
                 }
             };
-
-            setTimeout(function(){ // give it a second to deal with all those mouse and button presses...
-                console.log("button pressing done");
-                console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
-                console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
-                window.window2.document.querySelectorAll("*[class*=\"StepActions--next--\"]")[0].click();
-                callback(i, boole); // call window.k2
-            }, 1000);
+            window.k1(i, boole, callback, 5);
+        }
+        else if (part == 5){
+            console.log("button pressing done");
+            console.log("current start " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[0].getAttribute("aria-valuenow"));
+            console.log("current end " + window.window2.document.querySelectorAll("*[class*=\"Handle--slider--\"]")[1].getAttribute("aria-valuenow"));
+            window.window2.document.querySelectorAll("*[class*=\"StepActions--next--\"]")[0].click();
+            callback(i, boole); // call window.k2
         };
-    }, 1000);
-};
+    }, 500);
+}
 
 // wait for segment name data to appear on page
 window.k2 = function(i, boole) {
@@ -379,17 +397,17 @@ window.f3 = function(){
 };
 
 // code taken gratefully from https://ghostinspector.com/blog/simulate-drag-and-drop-javascript-casperjs/
-window.triggerDragAndDrop = function (elemDrag, xchange) {
+window.triggerDragAndDrop = function (elemDrag, xchange, win, doc) {
 
   // function for triggering mouse events
   var fireMouseEvent = function (type, elem, centerX, centerY) {
-    var evt = document.createEvent('MouseEvents');
-    evt.initMouseEvent(type, true, true, window, 1, 1, 1, centerX, centerY, false, false, false, false, 0, elem);
+    var evt = doc.createEvent('MouseEvents');
+    evt.initMouseEvent(type, true, true, win, 1, 1, 1, centerX, centerY, false, false, false, false, 0, elem);
     elem.dispatchEvent(evt);
   };
 
   // fetch target elements
-  var elemDrop = document;
+  var elemDrop = doc;
   if (!elemDrag || !elemDrop) return false;
 
   // calculate positions
