@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Convert bike segments to ebike segments on Strava
 // @namespace    https://github.com/nickbeeton
-// @version      0.6.3
+// @version      0.6.4
 // @description  Convert bike segments to ebike segments on Strava
 // @author       Nick Beeton
 // @match        https://www.strava.com/activities/*
@@ -32,12 +32,12 @@ window.f = async function(boole){
         window.namesorig = Array(window.stufforig.length - 1);
         window.start_indicesorig = Array(window.stufforig.length - 1);
         window.end_indicesorig = Array(window.stufforig.length - 1);
-        for (i = 1; i < window.stufforig.length; i++) // skip the first
+        for (i = 0; i < window.stufforig.length-1; i++) // skip the last
         {
-            window.namesorig[i-1] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
-            window.start_indicesorig[i-1] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
-            window.end_indicesorig[i-1] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
-            console.log("Original segment "+window.namesorig[i-1]+" start "+window.start_indicesorig[i-1]+" end "+window.end_indicesorig[i-1]);
+            window.namesorig[i] = window.stufforig[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
+            window.start_indicesorig[i] = window.stufforig[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
+            window.end_indicesorig[i] = window.stufforig[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
+            console.log("Original segment "+window.namesorig[i]+" start "+window.start_indicesorig[i]+" end "+window.end_indicesorig[i]);
         }
     }
     else { // make empty arrays
@@ -140,12 +140,12 @@ window.h = function(boole, callback){
                 window.names = Array(window.stuff.length - 1);
                 window.start_indices = Array(window.stuff.length - 1);
                 window.end_indices = Array(window.stuff.length - 1);
-                for (i = 1; i < window.stuff.length; i++) // skip the first
+                for (i = 0; i < window.stuff.length - 1; i++) // skip the last
                 {
-                    window.names[i-1] = window.stuff[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
-                    window.start_indices[i-1] = window.stuff[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
-                    window.end_indices[i-1] = window.stuff[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
-                    console.log("Loaded segment "+window.names[i-1]);
+                    window.names[i] = window.stuff[i].match(/\"name\":\"[^\"]+/g)[0].replace("\"name\":\"","")
+                    window.start_indices[i] = window.stuff[i].match(/start_index\":[0-9]+/g)[0].replace("start_index\":","")
+                    window.end_indices[i] = window.stuff[i].match(/end_index\":[0-9]+/g)[0].replace("end_index\":","")
+                    console.log("Loaded segment "+window.names[i]);
                 }
             }
             // now we have our data, change the ride back to e-bike ride

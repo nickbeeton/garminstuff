@@ -13,7 +13,7 @@
 #
 # Finally tell R where your data files and the FIT SDK are:
 data.folder = "C:/Users/bob/Downloads/"
-fitsdk.folder = "C:\\Program Files\\FitSDKRelease_20.67.00"
+fitsdk.folder = "C:\\Program Files\\FitSDKRelease_21.27.00"
 #-----------------------------
 
 
