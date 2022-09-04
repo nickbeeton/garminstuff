@@ -450,7 +450,7 @@ window.triggerDragAndDrop = function (elemDrag, xchange, win, doc) {
     return true;
 };
 
-if ((window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0 | window.document.getElementsByClassName("title")[0].innerHTML.search("E-Mountain Bike Ride") > 0) & window.document.getElementsByClassName("icon-edit").length > 0) { // your own ebike ride
+if ((window.document.title.search("E-Bike Ride") > 0 | window.document.title.search("E-Mountain Bike Ride") > 0) & window.document.getElementsByClassName("icon-edit").length > 0) { // your own ebike ride
     window.tms = (window.document.getElementsByClassName("alert-message2").length > 0)
 
     var btn1 = window.document.createElement("BUTTON"); // Create a <button> element
