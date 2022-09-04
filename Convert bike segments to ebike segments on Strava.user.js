@@ -69,10 +69,10 @@ window.z = function (boole, callback, ebike) {
         }
         else {
             if (!ebike) {
-                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("\nRide") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.title.search("\\| Ride") <= 0))
             }
             else {
-                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") | window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Mountain Bike Ride") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.title.search("\\| E-Bike Ride") <= 0 | window.window2.document.title.search("\\| E-Mountain Bike Ride") <= 0))
             }
         }
 
