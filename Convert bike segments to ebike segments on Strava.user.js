@@ -159,6 +159,7 @@ window.h = function (boole, callback) {
             console.log("Bike segments not loaded yet -- trying again");
             window.b1 = false;
             window.window2.location.reload();
+            setTimeout(function () { if (!window.b1) { window.h(boole, callback); window.b1 = true; } },5000);
         }
     }, 2000);
 };
