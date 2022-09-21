@@ -69,10 +69,10 @@ window.z = function (boole, callback, ebike) {
         }
         else {
             if (!ebike) {
-                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("\nRide") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.title.search("\\| Ride") <= 0))
             }
             else {
-                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") | window.window2.document.getElementsByClassName("title")[0].innerHTML.search("E-Mountain Bike Ride") <= 0))
+                window.boo = ((window.window2.document.URL.match("edit") != null) | (window.window2.document.title.search("\\| E-Bike Ride") <= 0 | window.window2.document.title.search("\\| E-Mountain Bike Ride") <= 0))
             }
         }
 
@@ -159,6 +159,7 @@ window.h = function (boole, callback) {
             console.log("Bike segments not loaded yet -- trying again");
             window.b1 = false;
             window.window2.location.reload();
+            setTimeout(function () { if (!window.b1) { window.h(boole, callback); window.b1 = true; } },5000);
         }
     }, 2000);
 };
@@ -450,7 +451,7 @@ window.triggerDragAndDrop = function (elemDrag, xchange, win, doc) {
     return true;
 };
 
-if ((window.document.getElementsByClassName("title")[0].innerHTML.search("E-Bike Ride") > 0 | window.document.getElementsByClassName("title")[0].innerHTML.search("E-Mountain Bike Ride") > 0) & window.document.getElementsByClassName("icon-edit").length > 0) { // your own ebike ride
+if ((window.document.title.search("E-Bike Ride") > 0 | window.document.title.search("E-Mountain Bike Ride") > 0) & window.document.getElementsByClassName("icon-edit").length > 0) { // your own ebike ride
     window.tms = (window.document.getElementsByClassName("alert-message2").length > 0)
 
     var btn1 = window.document.createElement("BUTTON"); // Create a <button> element
